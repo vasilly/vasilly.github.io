@@ -37,6 +37,16 @@
     .display {
       background-color: HoneyDew;
     }
+    @media(max-width: 1000px) {
+      button {
+        width: 12em;
+        height: 9em;
+        border-radius: 1em;
+        border: 1px solid black;
+        background-color: white;
+        outline: none;
+      }
+    }
     </style>
     <table id="map-controls">
       <tr>
@@ -252,7 +262,7 @@ var f = 200,
   mX = 0,
   mY = 0,
   loop = 0,
-  delay = 10,//1000 / 30,//33
+  delay = 10, //1000 / 30,//33
   time = 0,
   max_z = 0, //max height of all
   min_z = 0, //min height of all
