@@ -7,68 +7,52 @@
   <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" />
   <style>
   canvas {
-    position: absolute;
     border: 1px solid black;
-    z-index: -1;
-
+    position: relative;
+    position: inline-block;
   }
-  #map-controls {
+  .map-controls {
     display: block;
+    width: 10%;
+  }
+  .left-panel {
+    vertical-align: top;
   }
   button {
-    width: 4em;
-    height: 3em;
-    border-radius: 0.3em;
-    border: 1px solid black;
-    background-color: white;
-    outline: none;
+    width: 5em;
+    height: 4em;
+    border-radius: 5px;
+    background-color: lightBlue;
   }
-  @media(max-width: 800px) {
+  .display {
+    background-color: HoneyDew;
+  }
+  @media(max-width: 1000px) {
     button {
       border-radius: 1em;
       border: 1px solid black;
       background-color: white;
       outline: none;
-      font-size: 4em;
+      font-size: 2em;
     }
   }
   </style>
 </head>
-
+<div class="bottom-container">
 <body>
   <canvas id="canvas-map"></canvas>
+
   <table id="map-controls">
     <tr>
       <td>
-        <button class="btn btn-default btn-large">
-          </i><span>fps<br></span><span id="msgtop1"></span> </button>
-
-      </td>
-      <td>
-        <button class="btn btn-default btn-large">
-          </i><span>time<br></span><span id="msgtop2"></span> </button>
-
-      </td>
-      <td>
-        <button class="btn btn-default btn-large">
-          </i><span>time<br></span><span id="msgtop3"></span> </button>
-
-      </td>
-    </tr>
-
-    <tr>
-      <td>
-        <button id="buttonLeftFast" class="btn btn-default btn-large"><i class="glyphicon glyphicon-backward"></i>↺
-        </button>
-
+        <button id="msg1" class="display"></button>
       </td>
       <td>
         <button id="buttonUp" class="btn btn-default btn-large"><i class="glyphicon glyphicon-arrow-up"></i>
         </button>
       </td>
       <td>
-        <button id="buttonRightFast" class="btn btn-default btn-large"><i class="glyphicon glyphicon-forward"></i>
-        </button>
+        <button id="msg2" class="display"></button>
 
       </td>
     </tr>
@@ -103,39 +87,43 @@
     </tr>
 
   </table>
-  ⇱↺ ↻ ⤴ ⤵ ⤶ ⤷ ⤸ ⤹ ￩ ￪ ￫ ￬
-  <div id="msg"></div>
+  <div id="mainTitle" class="main-info"></div>
+  <div id="msg">msg</div>
+</div>
   <script>
   cc = function(a) {
     console.log(a)
   }
   var canvas1 = document.getElementById("canvas-map")
+    // var moveLeft  = document.getElementById("buttonLeft")
+    // var moveRight = document.getElementById("buttonRight")
+    // var moveUp    = document.getElementById("buttonUp")
+    // var moveDown  = document.getElementById("buttonDown")
   var ctx = canvas1.getContext("2d")
   canvas1.width = innerWidth;
-  canvas1.height = innerHeight * 0.8;
+  canvas1.height = innerHeight * 2 / 3;
   var centerX = canvas1.width / 2,
     centerY = canvas1.height / 2,
-    l = [],
     π = Math.PI,
     τ = 2 * π,
     sqrt = Math.sqrt,
     cos = Math.cos,
     sin = Math.sin,
-    round = Math.round,
-    floor = Math.floor,
-    abs = Math.abs,
-    fps = 30,
+    rnd = Math.round,
+    fps = 10,
     timer = 0,
     eye = 200,
     scale = 1,
-    ix = 0,
+    // rotation counters
+    ix = 60,
     iy = 60,
     iz = 60,
+    // rotation target values at end of rotation
     degIncr = π / 6 / fps, //30degrees rotated in 1 second @30fps
-    incrX = 0,
-    incrY = degIncr,
+    incrX = degIncr / 3,
+    incrY = degIncr / 3, //target
     zoomIncr = 1 / fps,
-    incrZ = zoomIncr,
+    incrZ = zoomIncr / 3,
     zoom = 1,
     zMin = .1,
     totalx = 0,
@@ -146,278 +134,232 @@
 
   canvas1.onmousemove = function(d) {
     mouseX = d.clientX;
-    mouseY = d.clientY;
-  };
+    mouseY = d.clientY
+  }
 
   function toggleTimer() {
       if (timer === 0) {
         timer = setInterval(main, fps)
       }
-    } //turn on if off
+    } //turn animation on if it is off
+
+
   document.getElementById("buttonRight").onclick = function() {
-    if (ix && incrX > 0)
-      return null; // only allow multiple klicks from same button
+    if (ix && incrX > 0) return null // disallaw if buttonLeft is active
     incrX = -degIncr;
     ix += fps;
-    toggleTimer();
+    toggleTimer()
   }
-  document.getElementById("buttonRightFast").onclick = function() {
-    if (ix && incrX > 0)
-      return null; // only allow multiple klicks from same button
-    incrX = -degIncr * 2;
-    ix += fps * 3;
-    toggleTimer();
-  }
+
   document.getElementById("buttonLeft").onclick = function() {
-    if (ix && incrX < 0)
-      return null;
+    if (ix && incrX < 0) return null
     incrX = degIncr;
     ix += fps;
-    toggleTimer();
+    toggleTimer()
   }
-  document.getElementById("buttonLeftFast").onclick = function() {
-    if (ix && incrX < 0)
-      return null;
-    incrX = degIncr * 2;
-    ix += fps * 3;
-    toggleTimer();
-  }
+
   document.getElementById("buttonDown").onclick = function() {
-    if (iy && incrY > 0)
-      return null;
+    if (iy && incrY > 0) return null // d
     incrY = -degIncr;
     iy += fps;
-    toggleTimer();
+    toggleTimer()
   }
+
   document.getElementById("buttonUp").onclick = function() {
-    if (iy && incrY < 0)
-      return null;
+    if (iy && incrY < 0) return null
     incrY = degIncr;
     iy += fps;
-    toggleTimer();
+    toggleTimer()
   }
+
   document.getElementById("buttonZoomOut").onclick = function() {
-    if (iz && incrZ > 0)
-      return null;
+    if (iz && incrZ > 0) return null // d
     incrZ = -zoomIncr;
     iz += fps;
-    toggleTimer();
+    toggleTimer()
   }
+
   document.getElementById("buttonZoomIn").onclick = function() {
-      if (iz && incrZ < 0)
-        return null;
-      incrZ = zoomIncr;
-      iz += fps;
-      toggleTimer();
-    }
-    //------------------------------------------------------------------------------
+    if (iz && incrZ < 0) return null
+    incrZ = zoomIncr;
+    iz += fps;
+    toggleTimer()
+  }
+
+
+
+
+
+
+
+
+  //------------------------------------------------------------------------------
   function sinc(x, y) {
-    var maxZval = 60
+    //y += 10
     var mag = sqrt(x * x + y * y)
-    var zz = (mag === 0) ? 1 : sin(mag) / mag
-      //var zz      = (zz>255) ? 255 : zz
-    return -zz * maxZval
+    var res = -60 * (sin(mag) / mag || 1)
+    if (mag === 0)
+      res = -60
+    return res
   }
 
-  function fn0(x, y) {
-    return 0
+  function terr(x, y) {
+    return sinc(x, y) + sinc(x + -3, y + -1) + sinc(x - -1, y + -3)
   }
 
-  function makeGrid(func) {
-    var ticMake = +new Date();
-    var grid = [];
-    var limit = 16 // 1/2 points not including 0
-    var xLimit = 3 / limit / 1 // grid endpoints: eg. at -100 ... 100 in metres
-    var yLimit = xLimit
-    var rowLength = limit * 2 + 1 // rowLength
-    var detail = 1 / rowLength
-    var count = 0
-    var stretch = 100 / limit
-    var z
-    var zorder = []
-    var len = rowLength * rowLength
-    for (var x = -limit; x <= limit; x++)
-      for (var y = -limit; y <= limit; y++) {
-        xx = x * xLimit
-        yy = y * yLimit
-        z = func(xx, yy)
-        zorder.push([count, z])
-        grid.push({
-          i: count++,
-          xx: xx, //not used xcept in bisection
-          yy: yy,
-          x: x * stretch, // always fill screen at any zoom for same nPoints
-          y: y * stretch,
+  function makeGrid(gridSize) {
+    var ix, iy, z, tic = +new Date(),
+      grid = [],
+      count = 0,
+      endValue = 10, // actual value of end  point
+      nPoints = gridSize * 3 + 1, // 1/2 points not including 0
+      rowLength = nPoints * 2 + 1,
+      stretch = endValue / nPoints,
+      fillView = 100 / nPoints //100px either side of centre
+    for (iy = -nPoints; iy <= nPoints; iy++)
+      for (ix = -nPoints; ix <= nPoints; ix++) {
+        z = terr(ix * stretch, iy * stretch)
+        var pp = {
+          count: count++,
+          x: ix * fillView,
+          y: iy * fillView,
           z: z,
-          z4: "",
+          h: (z < 0) ? 0 : z,
           _x: 0,
           _y: 0,
-          _z: 0,
-          az: 0, // z in middle of square
+          detail: 0
+        }
+        grid.push(pp)
+      }
+    document.getElementById("msg2").innerHTML = ("create:<br>" + (+new Date() - tic))
 
-          marker: 0,
-          color: ""
-        })
-      } // grid is finished!
-
-    /// after grid , modify shore:
-
-    cc("length " + grid.length)
-    cc('create grid time: ' + (+new Date() - ticMake) + " ms")
-
+    cc("rowLength " + rowLength)
+    cc("grid.length " + grid.length)
+    cc("grid.length/4 " + grid.length / 4)
+    cc("grid.length/4 " + Math.sqrt(grid.length / 4))
     return {
       grid: grid,
       rowLength: rowLength,
-      zorder: zorder,
+      fn: terr,
       stretch: stretch,
-      xLimit: xLimit,
-      fn: func,
-      maxZ: Math.max.apply(Math, grid.map(function(o) {
-        return o.z;
-      })),
-      minZ: Math.min.apply(Math, grid.map(function(o) {
-        return o.z;
-      }))
+      fillView: fillView,
+      createGridTime: (+new Date() - tic)
     }
   }
 
-  function eastWestShoreline(plane) {
-    var
-      grid = plane.grid,
-      func = plane.fn,
-      xLimit = plane.xLimit,
-      stretch = plane.stretch,
+  function adjustShore(plane, factor) {
+    /*      3 . 2 . 9
+            . . . . .
+            4 . 1 . 8
+            . . . . .
+            5 . 6 . 7
+    */
+    var ix, iy, p1, i1, i2, i3, i4, i5, i6, i7, i8, i9, grid = plane.grid,
+      fn = plane.fn,
       rowLength = plane.rowLength,
-      next_i, z1, z3
-    for (var irow = 0; irow < grid.length; irow += rowLength)
-      for (var iCol = 0; iCol < rowLength - 2; iCol += 2) {
-        i = irow + iCol
-        mid = i + 1
-        next_i = i + 2
-        grid[i].marker = 1
-        if (grid[next_i]) {
-          z1 = grid[i].z
-          z3 = grid[next_i].z
-          if (z1 * z3 < 0)
-            bisection(i, mid, next_i, grid, func, xLimit, stretch)
-          grid[next_i].marker = 2
-        }
+      stretch = plane.stretch,
+      fillView = plane.fillView,
+      abs = Math.abs,
+      ddx = Math.abs(grid[1].x - grid[0].x),
+      ddy = Math.abs(grid[1].y - grid[0].y),
+      minxy = Math.max(abs(ddx), abs(ddy)),
+      minDistance = Math.sqrt(ddx * ddx + ddy * ddy) || minxy
+
+    for (iy = 1; iy < rowLength - 1; iy += 1)
+      for (ix = 1; ix < rowLength - 1; ix += 1) {
+        i1 = ix + iy * rowLength
+        i2 = i1 - rowLength
+        i3 = i1 - rowLength - 1
+        i4 = i1 - 1
+        i5 = i1 + rowLength - 1
+        i6 = i1 + rowLength
+        i7 = i1 + rowLength + 1
+        i8 = i1 + 1
+        i9 = i1 - rowLength + 1
+        p1 = grid[i1]
+        if ((p1.z * grid[i2].z) < 0 ||
+          (p1.z * grid[i3].z) < 0 ||
+          (p1.z * grid[i4].z) < 0 ||
+          (p1.z * grid[i5].z) < 0 ||
+          (p1.z * grid[i6].z) < 0 ||
+          (p1.z * grid[i7].z) < 0 ||
+          (p1.z * grid[i8].z) < 0 ||
+          (p1.z * grid[i9].z) < 0
+        ) {
+          secantMethod2(p1, fn, minDistance, stretch, fillView, factor)
+        } else {}
       }
   }
 
-  function northSouthShoreline(plane) {
-    var
-      grid = plane.grid,
-      func = plane.fn,
-      xLimit = plane.xLimit,
-      stretch = plane.stretch,
-      rowLength = plane.rowLength,
-      z1, z3, i, mid, next_i, iCol, iRow
-    for (iCol = 0; iCol < rowLength - 2; iCol++) {
-      for (iRow = 0; iRow < grid.length; iRow += (rowLength * 2))
-        i = iRow + iCol
-      mid = i + rowLength
-      next_i = mid + rowLength
-      grid[i].marker = 1
-      if (grid[next_i]) {
-        z1 = grid[i].z
-        z3 = grid[next_i].z
-        if (z1 * z3 < 0)
-          bisection(i, mid, next_i, grid, func, xLimit, stretch)
-        grid[next_i].marker = 2
-      }
+  function directionAscent(x, y, fn) {
+    var tiny = 1e-7,
+      PI = Math.PI,
+      abs = Math.abs,
+      y0 = fn(x, y),
+      y1 = fn(x + tiny, y),
+      y2 = fn(x, y + tiny),
+      dx = y1 - y0,
+      dy = y2 - y0,
+      mag = Math.sqrt(dx * dx + dy * dy),
+      // the angle is not needed but ...
+      angle = Math.atan(abs(dy / dx))
+    if (dx > 0 && dy > 0) { //I
+      angle = angle
+    } else if (dx < 0 && dy > 0) { //II
+      angle = PI - angle
+    } else if (dx < 0 && dy < 0) { //III
+      angle = PI + angle
+    } else if (dx > 0 && dy < 0) { //IV
+      angle = -angle
     }
+    return [dx / mag, dy / mag, angle /* radians */ ]
   }
 
-  function sortByCol(arr, col) {
-    arr.sort(function(a, b) {
-      return a[col] - b[col]
-    })
-  }
-
-  function colors4(plane) {
-    var p1, p2, p3, p4,
-      grid = plane.grid,
-      xLimit = plane.xLimit,
-      rowLength = plane.rowLength
-    for (var iRow = rowLength; iRow < grid.length; iRow += rowLength)
-      for (var iCol = 1; iCol < rowLength; iCol++) {
-        var i = iRow + iCol
-        p1 = grid[i]
-        p2 = grid[i - 1]
-        p3 = grid[i - rowLength - 1]
-        p4 = grid[i - rowLength]
-        p1.color = colorize((p1.z + p2.z + p3.z + p4.z) / 4)
-      }
-  }
-
-  function colorize2(height) {
-    var h = height,
-      r, g, b
-    if (height < 0) {
-      h = floor(-h);
-      r = 150;
-      g = 150;
-      b = 200 + 50
-    } else if (height < 100) {
-      h = floor(h);
-      r = h + 50;
-      g = h + 50 + 50;
-      b = h + 50
-    } else if (height < 200) {
-      h = floor(h);
-      r = h + 50;
-      g = h + 50;
-      b = h + 50
+  function secantMethod2(p1, fn, minDistance, stretch, fillView, factor) { //fast,
+    /* fn(x,y)
+      finds zeros between t.p.
+    */
+    var z0, z1, dx, dy, x, x1, y1, distMoved,
+      x0 = p1.x / fillView * stretch,
+      y0 = p1.y / fillView * stretch,
+      x00 = x0,
+      y00 = y0,
+      count = 0,
+      maxIter = 20, // usually 8 iter stop
+      dir = directionAscent(x0, y0, fn), // [dx,dy,angle]
+      dx = dir[0] / 1000,
+      dy = dir[1] / 1000,
+      dydx = dir[1] / dir[0],
+      x1 = x0 + dx,
+      y1 = y0 + dy,
+      z0 = 0
+    while (maxIter-- && x1 !== x0) {
+      z0 = fn(x0, y0)
+      z1 = fn(x1, y1)
+      x = x1 - z1 * (x1 - x0) / (z1 - z0)
+      x0 = x1
+      y0 = y1
+      x1 = (isNaN(x)) ? x0 : x
+      y1 = (x - x00) * dydx + y00
+    }
+    dx = x1 - x00
+    dy = y1 - y00
+    distMoved = Math.sqrt(dx * dx + dy * dy)
+    if (distMoved < minDistance / factor && (typeof z1 != 'undefined')) {
+      p1.x = x1 * fillView / stretch
+      p1.y = y1 * fillView / stretch
+      p1.z = z1
+      p1.detail = 1
+      p1.h = (z1 < 0) ? 0 : z1
     } else {
-      h = floor(h);
-      r = h;
-      g = h;
-      b = h
+      return false
     }
-    return "rgb(" + r + "," + g + "," + b + ")"
+    return x0
   }
 
-  function colorize(z) {
-    var
-      snowLevel = 180,
-      seaLevel = 0
-    r = z + 0,
-      g = z + 30,
-      b = z + 0; // green hills
-    if (z > snowLevel) {
-      r = 180 - z * 2, g = 180 - z * 2, b = 180 - z * 2;
-    } //tallest==white
-    if (z < seaLevel) {
-      r = 240 + z, g = 240 + z, b = 240 + 22;
-    } //ocean=blue
-    r = round(r)
-    g = round(g)
-    b = round(b)
-    r = (r > 255) ? 255 : r;
-    g = (g > 255) ? 255 : g;
-    b = (b > 255) ? 255 : b;
-    r = (r < 0) ? 0 : r;
-    g = (g < 0) ? 0 : g;
-    b = (b < 0) ? 0 : b;
-    return "rgb(" + r + "," + g + "," + b + ")"
-  }
-
-  function updatez(plane) {
-    var zorder = plane.zorder
-    var p = plane.grid
-    for (var i = 0, ii; i < zorder.length; i++) {
-      ii = zorder[i][0]
-      zorder[i][1] = p[ii]["az"]
-    }
-    sortByCol(zorder, 1, "reverse");
-  }
 
   function main() {
-    if (ix < 1 && iy < 1 && iz < 1) { // check all animation increment countdowns
-      clearInterval(timer);
-      timer = 0
-    }
+    var tic = +new Date()
     if (ix) {
       ix--;
       totalx += incrX
@@ -431,153 +373,321 @@
       totalz += incrZ;
       if (totalz < zMin) totalz = zMin
     }
-    plane = world[0]
-    grid = plane.grid
-    rowLength = plane.rowLength
-    var tic1 = +new Date()
-    rotateGridPoints(totalx, totaly, grid, totalz, eye, plane.zorder)
-    document.getElementById("msgtop3").innerHTML = "rot " + round(+new Date() - tic1)
-    updatez(plane)
-    paintSquare(ctx, canvas1, grid, rowLength, rowLength, plane.zorder)
-      //drawPoints(ctx, canvas1, grid, rowLength, rowLength, plane.zorder)
-    document.getElementById("msgtop1").innerHTML = round(1000 / (+new Date() - tic1))
-  }
-
-  function drawPoints(ctx, canvas1, grid, rowLength, nRows) {
-    ctx.clearRect(0, 0, canvas1.width, canvas1.height);
-    ctx.strokeStyle = "grey";
-    ctx.beginPath();
-    pmiddle = round(rowLength * rowLength / 2)
-    for (var row = 0; row < grid.length; row += rowLength) {
-      ctx.moveTo(grid[row]._x, grid[row]._y);
-      for (var col = 0, i; col < rowLength; col++) {
-        i = col + row
-        ctx.lineTo(grid[i]._x, grid[i]._y)
-          //if ( (i>pmiddle-8)&&  (i<pmiddle+8 ) ) .... round(grid[i].i)+":"+
-        if (grid[i].marker === 3)
-          ctx.fillText((grid[i].marker), grid[i]._x, grid[i]._y)
-      }
+    if (ix < 1 && iy < 1 && iz < 1) { // check all animation increment countdowns
+      clearInterval(timer);
+      timer = 0
+      showTitle()
     }
-    ctx.stroke()
+    world.forEach(rotate)
+    draw(world[0])
+      //writeNumbers(world[0])
+    document.getElementById("msg1").innerHTML = ("ms</br>" + (+new Date() - tic))
   }
 
-  function paintSquare(ctx, canvas1, grid, rowLength, nRows, zorder) {
-    var tic = +new Date()
-    ctx.clearRect(0, 0, canvas1.width, canvas1.height);
-    ctx.strokeStyle = "grey";
-    var p1, p2, p3, p4, pnt //p1 is bottom right of square
-    for (var zzi = 0; zzi < zorder.length; zzi++) {
-      pnt = zorder[zzi][0]
-      if (pnt < rowLength || pnt % rowLength === 0)
-        continue
-        // if(pnt%rowLength===0) continue
-      p1 = grid[pnt]
-      p2 = grid[pnt - 1]
-      p3 = grid[pnt - rowLength - 1]
-      p4 = grid[pnt - rowLength]
-      ctx.strokeStyle = 'grey';
-      ctx.beginPath();
-      ctx.fillStyle = p1.color
-      ctx.moveTo(p1._x, p1._y);
-      ctx.lineTo(p2._x, p2._y)
-      ctx.lineTo(p3._x, p3._y)
-      ctx.lineTo(p4._x, p4._y)
-      p1.az = (p1._z + p2._z + p3._z + p4._z) / 4; // ☠ update az here because handy
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-      ctx.fillStyle = "black"
-    }
-    document.getElementById("msgtop2").innerHTML = (+new Date() - tic)
-    updatez(plane)
-  }
-
-  function rotateGridPoints(totalx, totaly, grid, totalz, eye, zorder) {
-    var
-      cosφx = cos(totalx),
-      sinφx = sin(totalx),
+  function rotate(plane) {
+    var x, y, z, x1, y1, z1, pnt, scale,
+      grid = plane.grid, //grid
+      rowLength = plane.rowLength,
+      cosθx = cos(totalx),
+      sinθx = sin(totalx),
       cosθy = cos(totaly),
       sinθy = sin(totaly),
-      x, y, z, x1, y1, z1, pnt, each, scale;
-    for (each = grid.length; each--;) {
-      pnt = grid[each]; //global
+      ip = grid.length;
+    while (ip--) {
+      pnt = grid[ip] //global
       x = pnt.x
       y = pnt.y
       z = pnt.z
-      x1 = x * cosφx - y * sinφx; //rotate in xy
-      y1 = x * sinφx + y * cosφx;
-      x = x1
+      x1 = x * cosθx - y * sinθx //rotate in xy
+      y1 = x * sinθx + y * cosθx
       y = y1
-      y1 = y * cosθy - z * sinθy; //rotate in yz
-      z1 = y * sinθy + z * cosθy;
-      scale = totalz / (1 - z1 / eye)
-      pnt._x = centerX + x1 * scale;
+      y1 = y * cosθy - z * sinθy //rotate in yz
+      z1 = y * sinθy + z * cosθy
+      scale = totalz / (1 - z1 / eye) // zoom = totalz
+      pnt._x = centerX + x1 * scale
       pnt._y = centerY + y1 * scale
-      pnt._z = z1 //* scale
-        //zorder[each][0]=each
-        //zorder[each][1]= pnt._z
     }
   }
 
+  initialRun = 1
+
+  function draw(plane) {
+      var ix, iy, p1, p2, p3, p4, i1, i2, i3, i4, p12, p14, p23, p34, pMid,
+        grid = plane.grid,
+        rowLength = plane.rowLength,
+        skip = 2, // make sure it is divisible
+        r2 = rowLength * skip
+        /*      3 . 2           3  23   2
+                . M .          34  Mi  12
+                4 . 1           4  14   1
+        */
+      ctx.clearRect(0, 0, canvas1.width, canvas1.height);
+      for (iy = skip; iy < rowLength; iy += skip)
+        for (ix = skip; ix < rowLength; ix += skip) {
+          i1 = ix + iy * rowLength
+          i2 = i1 - r2
+          i3 = i1 - r2 - skip
+          i4 = i1 - skip
+          p1 = grid[i1]
+          p2 = grid[i2]
+          p3 = grid[i3]
+          p4 = grid[i4]
+          p12 = grid[(i1 + i2) / 2]
+          p14 = grid[(i1 + i4) / 2]
+          p23 = grid[(i3 + i2) / 2]
+          p34 = grid[(i3 + i4) / 2]
+          pMid = grid[(i3 + i1) / 2]
+          if (!p1.details) {
+            //ctx.strokeStyle = "grey";
+            ctx.fillStyle = p1.color;
+
+            ctx.beginPath();
+            ctx.moveTo(p1._x, p1._y)
+            ctx.lineTo(p12._x, p12._y)
+            ctx.lineTo(p2._x, p2._y)
+            ctx.lineTo(p23._x, p23._y)
+            ctx.lineTo(p3._x, p3._y)
+            ctx.lineTo(p34._x, p34._y)
+            ctx.lineTo(p4._x, p4._y)
+            ctx.lineTo(p14._x, p14._y)
+            ctx.lineTo(p1._x, p1._y)
+            ctx.fill();
+
+          }
+          //ctx.closePath();
+
+          if (initialRun &&
+            p12.detail ||
+            p14.detail ||
+            p23.detail ||
+            p34.detail ||
+            pMid.detail
+          ) {
+            p1.detail = 1
+          }
+          //ctx.stroke()
+          if (p1.detail) {
+            ctx.strokeStyle = "grey";
+            ctx.fillStyle = p1.color;
+            ctx.beginPath();
+            ctx.moveTo(p1._x, p1._y)
+            ctx.lineTo(p12._x, p12._y)
+            ctx.lineTo(pMid._x, pMid._y)
+            ctx.lineTo(p14._x, p14._y)
+            ctx.closePath();
+            //ctx.stroke()
+            ctx.fill()
+
+            ctx.beginPath();
+            ctx.fillStyle = p12.color;
+            ctx.moveTo(p12._x, p12._y)
+            ctx.lineTo(p2._x, p2._y)
+            ctx.lineTo(p23._x, p23._y)
+            ctx.lineTo(pMid._x, pMid._y)
+            ctx.closePath();
+            //ctx.stroke()
+            ctx.fill()
+
+            ctx.beginPath();
+            ctx.moveTo(pMid._x, pMid._y)
+            ctx.fillStyle = pMid.color;
+            ctx.lineTo(p23._x, p23._y)
+            ctx.lineTo(p3._x, p3._y)
+            ctx.lineTo(p34._x, p34._y)
+            ctx.closePath();
+            //ctx.stroke()
+            ctx.fill()
+
+            ctx.beginPath();
+            ctx.fillStyle = p14.color;
+            ctx.moveTo(p14._x, p14._y)
+            ctx.lineTo(pMid._x, pMid._y)
+            ctx.lineTo(p34._x, p34._y)
+            ctx.lineTo(p4._x, p4._y)
+            ctx.closePath();
+            //ctx.stroke()
+            ctx.fill()
+          } //if p1.detail
+        } //for
+      initialRun = 0
+    } //function
 
 
+  function writeNumbers(plane) {
+    var grid = plane.grid,
+      i = grid.length
+    while (i--) {
+      p1 = grid[i]
+        //if(p1.x===0)
+      ctx.fillStyle = "black"
 
+      ctx.fillText(p1.count, p1._x, p1._y)
+      ctx.fillStyle = "white"
 
+      ctx.fillText(p1.count, p1._x + 1, p1._y + 1)
 
+    }
+  }
+  onkeydown = function(e) {
 
+    //alert('I work!!' + 'you pressed keyCode: ' + e.keyCode)
+    //js1k eye of beholder
+    // if this is a keydown event, keyDOWN gets the value 1, otherwise 0
+    //cc("e:"+e.keyCode)
+    var keyDOWN = e.type[5] ? 1 : 0,
+      key = e.keyCode
+    if (key === 37) moveLEFT()
+    if (key === 39) moveRIGHT()
+    if (key === 38) moveUP()
+    if (key === 40) moveDOWN()
+  }
 
-
-  function bisection(i, mid, next_i, grid, func, xLimit, stretch) {
-    var p1 = grid[i],
-      p2 = grid[mid],
-      p3 = grid[next_i],
-      x1 = p1.xx,
-      xx1 = x1,
-      x3 = p3.xx,
-      xx3 = x3,
-      y1 = p1.yy,
-      yy1 = y1,
-      y3 = p3.yy,
-      yy3 = y3, //copies
-      // 38 ... z= 1.23e-12 144 ... eps 2.220446049250313e-16
-      iter = 100,
-      x2, y2, z1, z2, z3
-    while (iter--) {
-      x2 = (x1 + x3) / 2
-      y2 = (y1 + y3) / 2
-      z1 = func(x1, y1)
-      z2 = func(x2, y2)
-      z3 = func(x3, y3)
-      if (z3 * z2 >= 0) { // if z2,z3 are both on same side of zero
-        x3 = x2
-        y3 = y2
-      } else {
-        x1 = x2
-        y1 = y2
+  function move_planes(x, y) {
+    for (var nP = 0; nP < world.length; nP++) {
+      var p = world[nP].grid; //grab next plane from array
+      var p1 = p.length;
+      while (p1--) {
+        p[p1].x += x;
+        p[p1].y += y;
       }
-    }
-    p2.x = x2 / xLimit * stretch
-    p2.y = y2 / xLimit * stretch
-    p2.z = z2
-    p2.marker = 3
-      //p2.color = colorize(p2.z)
-      //cc(", z: "+p2.z)
-      //cc("---------------------------------------------")
+    } //end moving all planes
   }
 
+  function moveUP() {
+    move_planes(0, 1);
+    draw(world[0]);
+    toggleTimer()
+  }
+
+  function moveDOWN() {
+    move_planes(0, -0.7);
+    draw(world[0]);
+    toggleTimer()
+  }
+
+  function moveRIGHT() {
+    move_planes(0.7, 0);
+    draw(world[0]);
+    toggleTimer()
+  }
+
+  function moveLEFT() {
+    move_planes(-0.7, 0);
+    draw(world[0]);
+    toggleTimer()
+  }
+
+  function addColor(plane) {
+    var ix, iy, p1, i1, i2, i3, i4, avz,
+      grid = plane.grid,
+      rowLength = plane.rowLength,
+      skip = 1, // make sure it is divisible
+      r2 = rowLength * skip,
+      snowLevel = 100
+    for (iy = skip; iy < rowLength; iy += skip)
+      for (ix = skip; ix < rowLength; ix += skip) {
+        i1 = ix + iy * rowLength
+        i2 = i1 - r2
+        i3 = i1 - r2 - skip
+        i4 = i1 - skip
+        avz = (grid[i1].z + grid[i2].z + grid[i3].z + grid[i4].z) / 4 || 0
+        grid[i1].debug = [i1, i2, i3, i4, grid[i1].z, grid[i2].z, grid[i3].z, grid[i4].z]
+          //if(grid[i1].x===0)cc(grid[i1].count)
+        grid[i1].color = colorize(avz, snowLevel, grid[i1], plane.fn, plane.fillView, plane.stretch)
+      }
+  }
+
+  function colorize(z, snowLevel, p1, fn, fillView, stretch) {
+
+    var r, g, b,
+      seaLevel = 0,
+      sun,
+      round = Math.round,
+      x = p1.x / fillView * stretch,
+      y = p1.y / fillView * stretch,
+      tiny = 0.000001,
+      z0 = fn(x, y),
+      z1 = fn(x, y + tiny),
+      dz = z1 - z0,
+      dx = tiny //* 1.41421356237,
+    sun = dz / dx * 20
+    r = -z + 20
+    g = -z + 40
+    b = -z + 20 // green hills
+    if (z > snowLevel) {
+      r = 180 - z * 2,
+        g = 180 - z * 2,
+        b = 180 - z * 2;
+    } //tallest==white
+    if (z < seaLevel) {
+      r = 255 + z * 3,
+        g = 255 + z * 2,
+        b = 255 + z / 2 + 100;
+    } //ocean=blue
+    if (z > seaLevel) {
+      r = r + sun;
+      g = g + sun;
+      b = b + sun;
+    }
+    r = (r > 255) ? 255 : r;
+    g = (g > 255) ? 255 : g;
+    b = (b > 255) ? 255 : b;
+    r = (r < 0) ? 0 : r;
+    g = (g < 0) ? 0 : g;
+    b = (b < 0) ? 0 : b;
+    r = round(r);
+    g = round(g);
+    b = round(b);
+    p1.avz = z
+    return "rgb(" + r + "," + g + "," + b + ")"
+  }
+
+  function showStuff(plane) {
+    var grid = plane.grid
+    for (var i = 0; i < grid.length; i++) {
+      var p = grid[i]
+        //if(p.x===0){
+      if (p.x === p.y)
+        cc("________________")
+      cc("i:" + i + " x:" + p.x + " y:" + p.y + " color:" + p.color + " avz:" + p.avz)
+      cc("z: " + p.z)
+        //}
+    }
+  }
+
+  function zeroSea(plane) {
+    var grid = plane.grid,
+      p
+    for (var i = 0; i < grid.length; i++) {
+      p = grid[i]
+      if (p.z < 0) p.z = 0
+    }
+  }
+
+titlePage=0
+function showTitle(){
+  titlePage++
+  if (titlePage>3)titlePage=0
+  document.getElementById("mainTitle").innerHTML = ("Title Page:<br>" + titlePage)
 
 
+}
 
-
-
-
-
-
-  world = [makeGrid(sinc)]
-  colors4(world[0])
-  eastWestShoreline(world[0])
-  northSouthShoreline(world[0])
+  var terrain = makeGrid(16)
+  cc("time create " + terrain.createGridTime)
+    //if(terrain.createGridTime>20 ) terrain = makeGrid(40)
+    // if(terrain.createGridTime>15 ) terrain = makeGrid(6)
+  world = [terrain]
+  terrainDetail = makeGrid(10)
+  adjustShore(world[0], 10)
+  addColor(world[0])
+  zeroSea(world[0])
+    //showStuff(world[0])
   toggleTimer()
+
+
+
+  //document.getElementById("msg2").innerHTML= ( "p1._x "+ Math.round(p1._x) )
   </script>
 </body>
 
