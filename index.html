@@ -9,15 +9,10 @@
   canvas {
     position: absolute;
     border: 1px solid black;
+    z-index: -1;
+
   }
   #map-controls {
-    display: block;
-    z-index: 1;
-  }
-  .sample {
-    position: absolute;
-    /*position         : relative;*/
-
     display: block;
   }
   button {
@@ -27,7 +22,6 @@
     border: 1px solid black;
     background-color: white;
     outline: none;
-    z-index: 1;
   }
   @media(max-width: 1000px) {
     button {
@@ -35,7 +29,7 @@
       border: 1px solid black;
       background-color: white;
       outline: none;
-      font-size: 3em;
+      font-size: 2em;
     }
   }
   </style>
@@ -46,17 +40,17 @@
   <table id="map-controls">
     <tr>
       <td>
-        <button class="">
+        <button class="btn btn-default btn-large">
           </i><span>fps<br></span><span id="msgtop1"></span> </button>
 
       </td>
       <td>
-        <button class="">
+        <button class="btn btn-default btn-large">
           </i><span>time<br></span><span id="msgtop2"></span> </button>
 
       </td>
       <td>
-        <button class="">
+        <button class="btn btn-default btn-large">
           </i><span>time<br></span><span id="msgtop3"></span> </button>
 
       </td>
@@ -64,16 +58,16 @@
 
     <tr>
       <td>
-        <button id="buttonLeftFast" class=""><i class="glyphicon glyphicon-backward"></i>
+        <button id="buttonLeftFast" class="btn btn-default btn-large"><i class="glyphicon glyphicon-backward"></i>↺
         </button>
 
       </td>
       <td>
-        <button id="buttonUp" class=""><i class="glyphicon glyphicon-arrow-up"></i>
+        <button id="buttonUp" class="btn btn-default btn-large"><i class="glyphicon glyphicon-arrow-up"></i>
         </button>
       </td>
       <td>
-        <button id="buttonRightFast" class=""><i class="glyphicon glyphicon-forward"></i>
+        <button id="buttonRightFast" class="btn btn-default btn-large"><i class="glyphicon glyphicon-forward"></i>
         </button>
 
       </td>
@@ -81,37 +75,36 @@
 
     <tr>
       <td>
-        <button id="buttonLeft" class=""><i class="glyphicon glyphicon-arrow-left"></i>
+        <button id="buttonLeft" class="btn btn-default btn-large"><i class="glyphicon glyphicon-arrow-left"></i>
         </button>
       </td>
       <td>
 
       </td>
       <td>
-        <button id="buttonRight" class=""><i class="glyphicon glyphicon-arrow-right"></i>
+        <button id="buttonRight" class="btn btn-default btn-large"><i class="glyphicon glyphicon-arrow-right"></i>
         </button>
       </td>
     </tr>
 
     <tr>
       <td>
-        <button id="buttonZoomIn" class=""><i class="glyphicon glyphicon-zoom-in"></i>
+        <button id="buttonZoomIn" class="btn btn-default btn-large"><i class="glyphicon glyphicon-zoom-in"></i>
         </button>
       </td>
       <td>
-        <button id="buttonDown" class=""><i class="glyphicon glyphicon-arrow-down"></i>
+        <button id="buttonDown" class="btn btn-default btn-large"><i class="glyphicon glyphicon-arrow-down"></i>
         </button>
       </td>
       <td>
-        <button id="buttonZoomOut" class=""><i class="glyphicon glyphicon-zoom-out"></i>
+        <button id="buttonZoomOut" class="btn btn-default btn-large"><i class="glyphicon glyphicon-zoom-out"></i>
         </button>
       </td>
     </tr>
 
   </table>
-  ⤴ ⤵ ⤶ ⤷ ⤸ ⤹ ￩ ￪ ￫ ￬
+  ⇱↺ ↻ ⤴ ⤵ ⤶ ⤷ ⤸ ⤹ ￩ ￪ ￫ ￬
   <div id="msg"></div>
-  <div class="sample">asdjfklajsfkljafldkjdaf</div>
   <script>
   cc = function(a) {
     console.log(a)
