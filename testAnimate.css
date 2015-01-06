@@ -1,0 +1,105 @@
+.stats {
+    background-color: #ededed;
+    color: #999999;
+    padding: 15px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    height: 108px;
+}
+
+.logo {
+    background-image: url('');
+    height: 82px;
+    width: 65px;
+    margin-left: 5px;
+    margin-right: 40px;
+}
+
+.date-scroller {
+    margin-left: 20px;
+    width: 75%;
+    overflow: hidden;
+}
+
+.date-scroller ul {
+    width: 1000%
+}
+
+.date-scroller ul li {
+    width: 10%;
+}
+
+.date-scroller .header {
+    font-size: 11px;
+    font-weight: normal;
+    color: #999999;
+    /*date,grad*/
+}
+
+.date-scroller .content {
+    margin-top: 5px;
+    font-size: 16px;
+    color: #000000;
+    border: 1px red;
+    color:red;
+
+    /*friday, A*/
+}
+
+.date-scroller .date {
+    margin-left: 30px;
+    margin-top: 20px;
+    width: 20%;
+    /*december 12; fri BLCOK*/
+}
+
+.date-scroller .grade {
+    margin-left: 25px;
+    margin-top: 20px;
+    width: 17%;
+}
+
+
+.left-arrow {
+    font-size: 43px;
+    margin-top: 17px;
+}
+
+.right-arrow {
+    font-size: 43px;
+    margin-top: 17px;
+}
+
+.inactive {
+    opacity: .4;
+}
+
+.moveLeft.ng-enter {
+  -webkit-animation:0.5s moveLeft;
+  animation:0.5s moveLeft;
+}
+
+@keyframes moveLeft {
+  from { margin-left: 100%; }
+  to { margin-left: 0%; }
+}
+
+@-webkit-keyframes moveLeft {
+  from { margin-left: 100%; }
+  to { margin-left: 0%; }
+}
+
+.moveRight.ng-leave {
+  -webkit-animation:0.5s moveRight;
+  animation:0.5s moveRight;
+}
+
+@keyframes moveRight {
+  from { margin-left: 0%; }
+  to { margin-left: 100%; }
+}
+
+@-webkit-keyframes moveRight {
+  from { margin-left: 0%; }
+  to { margin-left: 100%; }
+}
